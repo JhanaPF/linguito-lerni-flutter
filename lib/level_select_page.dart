@@ -3,15 +3,22 @@ import 'dart:math';
 import 'package:animate_do/animate_do.dart';
 
 class LevelSelectPage extends StatefulWidget {
-  const LevelSelectPage({super.key});
+  final List<String> items;
+  const LevelSelectPage({required this.items});
 
   @override
   State<LevelSelectPage> createState() => _LevelSelectPage();
 }
 
 class _LevelSelectPage extends State<LevelSelectPage> {
-  final List<String> items = ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'kk', "iuh"];
   double _selectedLesson = 0;
+  late List<String> items;
+
+  @override
+  void initState() {
+    super.initState();
+    items = widget.items;
+  }
 
   void _openLesson(double id) {
     setState(() {
@@ -75,8 +82,8 @@ class _LevelSelectPage extends State<LevelSelectPage> {
   }
 }
 
+// Temporary widget with bouncing animated button
 class SecondRoute extends StatelessWidget {
-  // Temporary widget with bouncing animated button
   const SecondRoute({super.key});
 
   @override
