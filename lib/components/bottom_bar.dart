@@ -45,7 +45,7 @@ class _NavBarState extends State<NavBar> {
                 label: 'Cours',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.business),
+                icon: Icon(Icons.insights),
                 label: 'Progression',
               ),
               BottomNavigationBarItem(

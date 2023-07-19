@@ -1,10 +1,10 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.test_flutter">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.linguito_lerni">
     <!-- Required to fetch data from the internet. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:usesCleartextTraffic="true"
-        android:label="test_flutter"
+        android:label="Linguito Lerni"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

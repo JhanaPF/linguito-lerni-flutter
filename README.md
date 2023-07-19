@@ -1,4 +1,4 @@
-# test_flutter
+# Linguito Lerni
 
 A test Flutter project.
 
