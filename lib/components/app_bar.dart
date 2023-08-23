@@ -67,12 +67,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       );
     });
 
-    print("On select button pressed");
+    //print("On select button pressed");
   }
 
   @override
   Widget build(BuildContext context) {
-    print({"selected course", selectedCourse});  
+    //print({"selected course", selectedCourse});  
     if (!selectedCourse) _onSelectCourseButtonPressed(context);
   
     return AppBar(
@@ -90,7 +90,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       title: Text(title),
-      leading: const BackButton(),
+      //leading: const BackButton(),
       actions: [
         IconButton(
           onPressed: () {

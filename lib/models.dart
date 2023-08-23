@@ -20,7 +20,6 @@ class CourseModel {
   });
 
   factory CourseModel.fromJson(Map<String, dynamic> json) {
-    //print(json);
     return CourseModel(
       id: json['_id'].toString(),
       language: json['language'],
@@ -33,9 +32,33 @@ class CourseModel {
     );
   }
 
-    // Override the toString() method
-  @override
-  String toString() {
-    return 'Person{language: $language, pivotLanguage: $pivotLanguage}';
+  // Override the toString() method
+  //@override
+  //String toString() {
+  //  return '{language: $language, pivotLanguage: $pivotLanguage}';
+  //}
+}
+
+
+class LessonModel {
+  final String id;
+  final String dictionaryId;
+  final String name;
+  final String description;
+
+  LessonModel({
+    required this.id,
+    required this.dictionaryId,
+    required this.name,
+    required this.description,
+  });
+
+  factory LessonModel.fromJson(Map<String, dynamic> json) {
+    return LessonModel(
+      id: json['_id'].toString(),
+      dictionaryId: json['dictionary_id'].toString(),
+      name: json['name'],
+      description: json['description'],
+    );
   }
 }

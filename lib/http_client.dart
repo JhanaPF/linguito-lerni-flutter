@@ -48,5 +48,17 @@ Future<List<CourseModel>> fetchCourses() async {
   for (var course in response["data"]["courses"]) {
     courses.add(CourseModel.fromJson(course));
   }
+  //print({"courses from fetch: ": courses});
   return courses;
+}
+
+
+Future<List<LessonModel>> fetchLessons(courseId) async {
+  Map<String, dynamic> response = await request("lessons", "get", courseId);
+  List<LessonModel> lessons = [];
+  for (var lesson in response["data"]["lessons"]) {
+    lessons.add(LessonModel.fromJson(lesson));
+  }
+  print({"lessons from fetch: ": lessons});
+  return lessons;
 }

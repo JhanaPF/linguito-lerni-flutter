@@ -7,12 +7,11 @@ import './http_client.dart';
 import 'question.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-///
-/// Select lesson component
-///
+/// Select lesson widget
+
 class LevelSelectPage extends StatefulWidget {
   final String? courseId;
-  const LevelSelectPage({required this.courseId});
+  const LevelSelectPage({required this.courseId, Key? key}) : super(key: key);
 
   @override
   State<LevelSelectPage> createState() => _LevelSelectPage();
@@ -20,46 +19,30 @@ class LevelSelectPage extends StatefulWidget {
 
 class _LevelSelectPage extends State<LevelSelectPage> {
   // Lesson selection view
-  String? _selectedLesson;
-  late Future<List<CourseModel>> _courses;
 
   @override
   void initState() {
     //print("level select component");
     super.initState();
-    _courses = fetchCourses();
     //_lessons = fetchLessons(widget.courseId);
-  }
-
-  void _openLesson(String id) {
-    //print("Open lesson");
-    setState(() {
-      _selectedLesson = id;
-    });
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Question()),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-
-    return FutureBuilder<List<CourseModel>>(
-      future: _courses,
-      builder: (context, snapshot) {
-        print({"context level select page", context});
-        print({"snapshot level select page", snapshot.data});
-
+    return FutureBuilder<List<LessonModel>>(
+      future: fetchLessons("64941e17b5399789d24e2118"),
+      builder: (_, snapshot) {
+        //print({"context level select page", context});
+        //print({"snapshot level select page", snapshot.data});
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Text("Erreur: ${snapshot.error}");
-        } else {
-          print(snapshot.connectionState == ConnectionState.done);
+        } else if (snapshot.connectionState == ConnectionState.done) {
           Fluttertoast.showToast(msg: "Données récupérées !");
-          return LessonList(items: _courses);
+          return LessonList(lessonList: snapshot.data);
+        } else {
+          return const Text("Failed to fetch for unknow reason");
         }
       },
     );
@@ -67,22 +50,22 @@ class _LevelSelectPage extends State<LevelSelectPage> {
 }
 
 class LessonList extends StatefulWidget {
-  final Future<List<Object>> items;
+  final List<LessonModel>? lessonList;
 
-  LessonList({required this.items});
+  const LessonList({required this.lessonList, Key? key}) : super(key: key);
 
   @override
   State<LessonList> createState() => _LessonListState();
 }
 
 class _LessonListState extends State<LessonList> {
-  List<Object>? lessonList;
+  late List<LessonModel>? lessonList;
   List<double> resultList = [];
 
   @override
   void initState() {
     super.initState();
-    // lessonList = widget.items;
+    lessonList = widget.lessonList;
     initializeDataOnce();
   }
 
@@ -92,6 +75,14 @@ class _LessonListState extends State<LessonList> {
       final randomSide = lessonList!.indexOf(element) % 2 == 0 ? (1 - randomNumber) : (-1 + randomNumber);
       resultList.add(randomSide);
     });
+  }
+
+
+  void _openLesson(String id) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Question(lessonId: id)),
+    );
   }
 
   @override
@@ -105,6 +96,7 @@ class _LessonListState extends State<LessonList> {
           child: LessonCard(
             screenWidth: screenWidth,
             index: index,
+            lesson: lessonList![index]
           ),
         );
       },
@@ -113,13 +105,16 @@ class _LessonListState extends State<LessonList> {
 }
 
 class LessonCard extends StatelessWidget {
-  const LessonCard({super.key, required this.screenWidth, required this.index});
+  const LessonCard({super.key, required this.screenWidth, required this.index, required this.lesson});
 
   final double screenWidth;
   final int index;
+  final LessonModel lesson;
+
 
   @override
   Widget build(BuildContext context) {
+  print("lesson card");
     return Container(
         width: screenWidth / 2,
         child: Card(
@@ -133,7 +128,7 @@ class LessonCard extends StatelessWidget {
                 child: Stack(children: [
                   Container(
                     height: 130,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.0), image: const DecorationImage(image: NetworkImage("assets/FrFlag.png"), fit: BoxFit.fill)),
+                   // decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.0), image: const DecorationImage(image: NetworkImage(lesson.url), fit: BoxFit.fill)),
                   ),
                   Positioned(
                       bottom: 16.0,
@@ -161,6 +156,7 @@ class LessonCard extends StatelessWidget {
 }
 
 // Temporary widget with bouncing animated button
+// Actually called anywhere
 class SecondRoute extends StatelessWidget {
   const SecondRoute({super.key});
 
@@ -171,7 +167,7 @@ class SecondRoute extends StatelessWidget {
         title: const Text('Nom du niveau'),
       ),
       body: Column(children: <Widget>[
-        Text('hello'),
+        const Text('hello'),
         ElevatedButton(
             onPressed: () {
               // Navigate where you want
@@ -180,7 +176,7 @@ class SecondRoute extends StatelessWidget {
                 child: Container(
               width: 10,
               height: 10,
-              decoration: BoxDecoration(color: Colors.red),
+              decoration: const BoxDecoration(color: Colors.red),
             ))),
       ]),
     );
