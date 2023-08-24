@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './http_client.dart';
 
 class Question extends StatefulWidget {
   final String lessonId;
@@ -24,6 +25,8 @@ class _QuestionState extends State<Question> {
   Future<void> fetchData() async {
     // Effectuer la requête de récupération en utilisant widget.lessonId
     // Exemple fictif : Remplacer cette logique par votre propre logique de requête
+
+
     await Future.delayed(const Duration(seconds: 2));
     setState(() {
       fetchedData = 'Données récupérées pour l\'ID ${widget.lessonId}';
@@ -42,8 +45,6 @@ class _QuestionState extends State<Question> {
               ElevatedButton(
                 onPressed: () async {
                   // Lire le fichier audio
-                  // final player = AudioPlayer();
-                  // await player.play('path/to/audiofile.mp3');
                 },
                 child: const Text('Lire le fichier audio'),
               ),

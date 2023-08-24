@@ -7,7 +7,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 var rootUrl = 'http://10.0.2.2:7005/'; // When you are using android emulator 10.0.2.2 is the correct localhost
 
-Future<Map<String, dynamic>> request(String endpoint, [String method = "get", Map<String, dynamic>? data]) async {
+Future<Map<String, dynamic>> request(String endpoint, {String method = "get", Map<String, dynamic>? data}) async {
+  print("REQUEST");
   await dotenv.load(fileName: ".env");
   var isProd = dotenv.env['ENV'] == "prod";
   if (isProd) {
@@ -54,11 +55,11 @@ Future<List<CourseModel>> fetchCourses() async {
 
 
 Future<List<LessonModel>> fetchLessons(courseId) async {
-  Map<String, dynamic> response = await request("lessons", "get", courseId);
+  Map<String, dynamic> response = await request("lessons", data: {"course_id": courseId});
   List<LessonModel> lessons = [];
   for (var lesson in response["data"]["lessons"]) {
     lessons.add(LessonModel.fromJson(lesson));
   }
   print({"lessons from fetch: ": lessons});
   return lessons;
-}
+} 

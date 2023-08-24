@@ -6,6 +6,7 @@ import 'package:lingui_lerni/models.dart';
 import './http_client.dart';
 import 'question.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import './global_colors.dart';
 
 /// Select lesson widget
 
@@ -60,20 +61,20 @@ class LessonList extends StatefulWidget {
 
 class _LessonListState extends State<LessonList> {
   late List<LessonModel>? lessonList;
-  List<double> resultList = [];
+  List<double> cardPositions = [];
 
   @override
   void initState() {
     super.initState();
     lessonList = widget.lessonList;
-    initializeDataOnce();
+    setCardPos();
   }
 
-  void initializeDataOnce() {
+  void setCardPos() {
     lessonList!.forEach((element) {
       double randomNumber = 0.3 + (Random().nextDouble() * 0.7);
       final randomSide = lessonList!.indexOf(element) % 2 == 0 ? (1 - randomNumber) : (-1 + randomNumber);
-      resultList.add(randomSide);
+      cardPositions.add(randomSide);
     });
   }
 
@@ -92,7 +93,7 @@ class _LessonListState extends State<LessonList> {
       itemBuilder: (BuildContext context, int index) {
         double screenWidth = MediaQuery.of(context).size.width;
         return Align(
-          alignment: const Alignment(0.0, 0.0),
+          alignment: Alignment(cardPositions[index], 0.0),
           child: LessonCard(
             screenWidth: screenWidth,
             index: index,
@@ -110,42 +111,72 @@ class LessonCard extends StatelessWidget {
   final double screenWidth;
   final int index;
   final LessonModel lesson;
-
-
+  
   @override
   Widget build(BuildContext context) {
-  print("lesson card");
     return Container(
-        width: screenWidth / 2,
+        width: screenWidth * 0.75,
         child: Card(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0), // Modifier le rayon selon votre préférence
+              borderRadius: BorderRadius.circular(12.0), 
             ),
             child: InkWell(
                 onTap: () {
-                  //_openLesson(items[index]);
+                    //_openLesson(items[index]);
                 },
                 child: Stack(children: [
-                  Container(
-                    height: 130,
-                   // decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.0), image: const DecorationImage(image: NetworkImage(lesson.url), fit: BoxFit.fill)),
+                  Container( // Background
+                    height: 190,
+                    decoration: BoxDecoration(
+                      color: generateRandomColor(),
+                      borderRadius: BorderRadius.circular(12.0), 
+                      //image: const DecorationImage(image: NetworkImage(lesson.url), fit: BoxFit.fill), 
+                    ),
                   ),
-                  Positioned(
+                  Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: 
+                      Container( // Progress bar  
+                        height: 10,
+                        width: double.infinity * 0.5,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: FractionallySizedBox(
+                          alignment: Alignment.centerLeft,
+                          widthFactor: 0.5, // Coefficient de progression
+                          child: Container(
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: GlobalColors.primaryMainColor,
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ),
+                  Positioned( // Texts
                       bottom: 16.0,
                       left: 16.0,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Niveau $index',
+                            capitalizeFirstLetter(lesson.name),
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Colors.grey, fontFamily: 'Monserrat', fontWeight: FontWeight.bold, fontSize: 25),
+                            style: const TextStyle(
+                              color: Colors.white, 
+                              fontFamily: 'Monserrat', 
+                              fontWeight: FontWeight.bold, 
+                              fontSize: 20
+                            ),
                           ),
                           const SizedBox(height: 1.0),
-                          const Text(
-                            'Texte inférieur',
-                            style: TextStyle(
-                              color: Colors.grey,
+                          Text(
+                            capitalizeFirstLetter(lesson.description),
+                            style: const TextStyle(
+                              color: Colors.white,
                               fontSize: 12.0,
                             ),
                           ),
@@ -181,4 +212,21 @@ class SecondRoute extends StatelessWidget {
       ]),
     );
   }
+}
+
+String capitalizeFirstLetter(String text) {
+  if (text == null || text.isEmpty) {
+    return text; 
+  }
+  else {
+    return text[0].toUpperCase() + text.substring(1);
+  }
+}
+
+Color generateRandomColor() {
+  final random = Random();
+  final r = random.nextInt(256); // Valeurs entre 0 et 255
+  final g = random.nextInt(256);
+  final b = random.nextInt(256);
+  return Color.fromARGB(255, r, g, b);
 }

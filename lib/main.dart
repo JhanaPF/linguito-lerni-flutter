@@ -73,7 +73,7 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color.fromARGB(255, 236, 236, 236),
         appBar: CustomAppBar(
           title: 'Lingui Lerni',
           gradientColors: const [Color.fromARGB(255, 158, 255, 161), Color.fromARGB(255, 44, 255, 202)], 
