@@ -8,8 +8,6 @@ import './components/app_bar.dart';
 import './components/bottom_bar.dart';
 import './http_client.dart';
 
-int hello = 10;
-
 void main() async {
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
@@ -26,7 +24,7 @@ class _MyAppState extends State<MyApp> {
   SharedPreferences? _prefs;
   bool isLoading = true;
   late List<CourseModel> _courses;
-  String? selectectedCourseId;
+  String selectedCourseId = "";
   bool courseSelected = false;
 
   Future<void> firsFetch() async {
@@ -38,24 +36,29 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initSharedPreferences() async {
     _prefs = await SharedPreferences.getInstance();
+    await _prefs!.clear();
     //print({"prefs:", _prefs});
-    _loadDataLocally();
+    //_loadDataLocally();
   }
 
-  void _loadDataLocally() {
-    if (_prefs != null) {
-      selectectedCourseId = _prefs!.getString('selectectedCourseId');
-      if(selectectedCourseId != null) {
-        courseSelected = true;
-      }
-      //print('selectectedCourseId: $selectectedCourseId');
-    }
-  }
+  //void _loadDataLocally() {
+  //  if (_prefs != null) {
+  //    selectedCourseId = _prefs!.getString('selectectedCourseId');
+  //    if(selectedCourseId != null) {
+  //      courseSelected = true;
+  //    }
+  //    //print('selectectedCourseId: $selectectedCourseId');
+  //  }
+  //}
 
-  void _saveDataLocally(String id) {
-    if (_prefs != null) {
-      _prefs!.setString('selectectedCourseId', id);
-    }
+  void _saveCourseId(String id) async {
+    print(id);
+    _prefs = await SharedPreferences.getInstance();
+    await _prefs!.setString('selectedCourseId', id);
+    setState(() {
+      selectedCourseId = id;
+      courseSelected = true;
+    });
   }
 
   @override
@@ -66,6 +69,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
+  void didUpdateWidget(covariant MyApp oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print({"course id updated ?": selectedCourseId});
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (isLoading) return const CircularProgressIndicator();
 
@@ -73,36 +82,16 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
-        backgroundColor: Color.fromARGB(255, 236, 236, 236),
+        backgroundColor: const Color.fromARGB(255, 236, 236, 236),
         appBar: CustomAppBar(
           title: 'Lingui Lerni',
           gradientColors: const [Color.fromARGB(255, 158, 255, 161), Color.fromARGB(255, 44, 255, 202)], 
           selectedCourse: courseSelected,
           courses:  _courses,
-          updateSelectedCourse: _saveDataLocally,
+          updateSelectedCourse: _saveCourseId,
         ),
-        body: courseSelected ? LevelSelectPage(courseId: selectectedCourseId) : const CircularProgressIndicator(),
+        body: selectedCourseId != "" ? LevelSelectPage(courseId: selectedCourseId) : const CircularProgressIndicator(),
         bottomNavigationBar: const NavBar()
-      ),
-    );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Linguito Lerni"),
-        centerTitle: true,
-      ),
-      body: Container(
-        width: 100,
-        height: 100,
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(8),
-        decoration: const BoxDecoration(color: Colors.purple, shape: BoxShape.circle),
-        child: const Text("Je suis un bouton"),
       ),
     );
   }

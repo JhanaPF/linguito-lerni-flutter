@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lingui_lerni/models.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../shared_prefs_helper.dart';
 
 // Top bar with course selection
-
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget { 
   
   final String title;
   final List<Color> gradientColors;
   final bool selectedCourse;
   final List<CourseModel> courses;
-  String flagUrl = "";
   final void Function(String) updateSelectedCourse;
   
-  CustomAppBar({
+  const CustomAppBar({
     super.key,
     required this.title, 
     required this.gradientColors, 
@@ -23,57 +22,58 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.updateSelectedCourse
   });
 
-  void _getFlagUrl(fileName){
-    flagUrl = "${dotenv.env['API_URL'] ?? ""}pictures/courses/$fileName";
+  String _getFlagUrl(fileName){
+    String flagUrl = "${dotenv.env['API_URL'] ?? ""}pictures/courses/$fileName";
+    return flagUrl;
   }
 
-  void _onSelectCourseButtonPressed(BuildContext context) async{
+  void _openCourseSelection(BuildContext context) async{
     await dotenv.load(fileName: ".env");
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      
+
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
+          return SimpleDialog(
             title: const Text('Sélectionnez un cours'),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: courses.length, // Replace with the actual number of items in your list
-                itemBuilder: (context, index) {
-                  //print({context, index});
-                  CourseModel course = courses[index];
-                  String fileName = course.fileName;
-                  //String flagUrl = _getFlagUrl(fileName);
-                  _getFlagUrl(fileName);
-                  
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(flagUrl), //
-                    ),
-                    title: Text(course.language),
-                    onTap: () async {
-                      updateSelectedCourse(course.id);
-                      Navigator.of(context).pop();
-                    },
-                  );
-                },
-              ),
-            ),
+            children: <Widget> [
+              SizedBox(
+                height: 200, 
+                width: 200, 
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: courses.length,
+                  itemBuilder: (context, index) {
+                    //print({context, index});
+                    CourseModel course = courses[index];
+                    String fileName = course.fileName;
+                    String flagUrl = _getFlagUrl(fileName);
+
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(flagUrl), //
+                      ),
+                      title: Text(course.language),
+                      onTap: () async {
+                        updateSelectedCourse(course.id);
+                        Navigator.of(context).pop();
+                      },
+                    );
+                  },
+                ),
+              )
+            ]
           );
         },
       );
     });
-
-    //print("On select button pressed");
   }
 
   @override
   Widget build(BuildContext context) {
     //print({"selected course", selectedCourse});  
-    if (!selectedCourse) _onSelectCourseButtonPressed(context);
+    if (!selectedCourse) _openCourseSelection(context); 
   
     return AppBar(
       systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Colors.grey),
@@ -94,7 +94,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(
           onPressed: () {
-            _onSelectCourseButtonPressed(context);
+            _openCourseSelection(context);
           },
           icon: const Icon(Icons.format_list_bulleted_outlined),
         ),

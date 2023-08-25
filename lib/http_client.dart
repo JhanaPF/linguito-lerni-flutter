@@ -4,22 +4,40 @@ import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import './models.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:io';
 
-var rootUrl = 'http://10.0.2.2:7005/'; // When you are using android emulator 10.0.2.2 is the correct localhost
+String rootUrl = "";
+String apiUrl = "";
 
-Future<Map<String, dynamic>> request(String endpoint, {String method = "get", Map<String, dynamic>? data}) async {
-  print("REQUEST");
+Future<String> getRootUrl () async{
+  
   await dotenv.load(fileName: ".env");
   var isProd = dotenv.env['ENV'] == "prod";
   if (isProd) {
-    var apiUrl = dotenv.env['API_URL'];
-    if (apiUrl != null) rootUrl = apiUrl;
+    if(apiUrl != "") return apiUrl;
+    var getApiUrl = dotenv.env['API_URL'];
+    if(getApiUrl != null) apiUrl = getApiUrl;
+    if (apiUrl != "") return apiUrl;
   }
 
+  if(rootUrl != "") return rootUrl;
+
+  if (Platform.isAndroid || Platform.isIOS) {
+    rootUrl = 'http://10.0.2.2:7005/'; // When you are using android emulator 10.0.2.2 is the correct localhost
+  } else {
+    rootUrl = 'http://127.0.0.1:7005/';
+  }
+
+  return rootUrl;
+}
+
+Future<Map<String, dynamic>> request(String endpoint, {String method = "get", Map<String, dynamic>? data}) async {
+
+  var rootUrl = await getRootUrl();
   var url = Uri.parse(rootUrl + endpoint);
   print({"request", url, method, data});
 
-  http.Response response;
+  http.Response response; 
   if (method == "post") {
     response = await http.post(url, body: data);
   } else if (method == "put") {
@@ -27,11 +45,13 @@ Future<Map<String, dynamic>> request(String endpoint, {String method = "get", Ma
   } else if (method == "delete") {
     response = await http.delete(url, body: data);
   } else {
-    response = await http.get(url);
+    final queryString = Uri(queryParameters: data).query;
+    final uri = Uri.parse('$url?$queryString');
+    response = await http.get(uri);
   }
 
-  print({"Status code:", response.statusCode});
-  print({"Body:", response.body});
+  // print({"Status code": response.statusCode, "Body": response.body});
+  
   if (response.statusCode >= 200 && response.statusCode <= 299) {
     final jsonResponse = jsonDecode(response.body);
     return jsonResponse;
@@ -62,4 +82,4 @@ Future<List<LessonModel>> fetchLessons(courseId) async {
   }
   print({"lessons from fetch: ": lessons});
   return lessons;
-} 
+}

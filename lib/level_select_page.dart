@@ -7,11 +7,13 @@ import './http_client.dart';
 import 'question.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import './global_colors.dart';
+import './shared_prefs_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import './utils.dart';
 
-/// Select lesson widget
-
+// Select lesson widget
 class LevelSelectPage extends StatefulWidget {
-  final String? courseId;
+  final String courseId;
   const LevelSelectPage({required this.courseId, Key? key}) : super(key: key);
 
   @override
@@ -21,17 +23,40 @@ class LevelSelectPage extends StatefulWidget {
 class _LevelSelectPage extends State<LevelSelectPage> {
   // Lesson selection view
 
+  late String courseId;
+  late Future<List<LessonModel>> lessons;
+
   @override
   void initState() {
-    //print("level select component");
     super.initState();
-    //_lessons = fetchLessons(widget.courseId);
+    courseId = widget.courseId;
+    lessons = fetchLessons(courseId);
+    loadData();
+  }
+
+   @override
+  void didUpdateWidget(covariant LevelSelectPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    setState(() {
+      lessons = fetchLessons(courseId);
+    });
+  }
+
+  Future<void> loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String getId = prefs.getString("selectedCourseId") ?? "";
+    setState(() {
+      courseId = getId;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if(courseId == "") return const Text("Error");
+
     return FutureBuilder<List<LessonModel>>(
-      future: fetchLessons("64941e17b5399789d24e2118"),
+      future: lessons,
       builder: (_, snapshot) {
         //print({"context level select page", context});
         //print({"snapshot level select page", snapshot.data});
@@ -128,13 +153,13 @@ class LessonCard extends StatelessWidget {
                   Container( // Background
                     height: 190,
                     decoration: BoxDecoration(
-                      color: generateRandomColor(),
+                      color: Utils.generateRandomColor(),
                       borderRadius: BorderRadius.circular(12.0), 
                       //image: const DecorationImage(image: NetworkImage(lesson.url), fit: BoxFit.fill), 
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: 
                       Container( // Progress bar  
                         height: 10,
@@ -163,18 +188,18 @@ class LessonCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            capitalizeFirstLetter(lesson.name),
+                            Utils.capitalizeFirstLetter(lesson.name),
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.white, 
-                              fontFamily: 'Monserrat', 
+                              fontFamily: 'FontAwesome', 
                               fontWeight: FontWeight.bold, 
                               fontSize: 20
                             ),
                           ),
                           const SizedBox(height: 1.0),
                           Text(
-                            capitalizeFirstLetter(lesson.description),
+                            Utils.capitalizeFirstLetter(lesson.description),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12.0,
@@ -182,22 +207,22 @@ class LessonCard extends StatelessWidget {
                           ),
                         ],
                       ))
-                ]))));
+                ]
+              )
+            )
+        )
+    );
   }
 }
 
 // Temporary widget with bouncing animated button
 // Actually called anywhere
-class SecondRoute extends StatelessWidget {
-  const SecondRoute({super.key});
+class AnimatedButton extends StatelessWidget {
+  const AnimatedButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nom du niveau'),
-      ),
-      body: Column(children: <Widget>[
+    return  Column(children: <Widget>[
         const Text('hello'),
         ElevatedButton(
             onPressed: () {
@@ -209,24 +234,7 @@ class SecondRoute extends StatelessWidget {
               height: 10,
               decoration: const BoxDecoration(color: Colors.red),
             ))),
-      ]),
+      ]
     );
   }
-}
-
-String capitalizeFirstLetter(String text) {
-  if (text == null || text.isEmpty) {
-    return text; 
-  }
-  else {
-    return text[0].toUpperCase() + text.substring(1);
-  }
-}
-
-Color generateRandomColor() {
-  final random = Random();
-  final r = random.nextInt(256); // Valeurs entre 0 et 255
-  final g = random.nextInt(256);
-  final b = random.nextInt(256);
-  return Color.fromARGB(255, r, g, b);
 }
