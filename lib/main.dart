@@ -37,22 +37,9 @@ class _MyAppState extends State<MyApp> {
   Future<void> _initSharedPreferences() async {
     _prefs = await SharedPreferences.getInstance();
     await _prefs!.clear();
-    //print({"prefs:", _prefs});
-    //_loadDataLocally();
   }
 
-  //void _loadDataLocally() {
-  //  if (_prefs != null) {
-  //    selectedCourseId = _prefs!.getString('selectectedCourseId');
-  //    if(selectedCourseId != null) {
-  //      courseSelected = true;
-  //    }
-  //    //print('selectectedCourseId: $selectectedCourseId');
-  //  }
-  //}
-
   void _saveCourseId(String id) async {
-    print(id);
     _prefs = await SharedPreferences.getInstance();
     await _prefs!.setString('selectedCourseId', id);
     setState(() {
@@ -69,14 +56,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
-  void didUpdateWidget(covariant MyApp oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    print({"course id updated ?": selectedCourseId});
-  }
-
-  @override
   Widget build(BuildContext context) {
     if (isLoading) return const CircularProgressIndicator();
+    print(selectedCourseId);
 
     return MaterialApp(
       home: Scaffold(

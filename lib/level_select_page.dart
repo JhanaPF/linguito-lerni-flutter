@@ -7,8 +7,6 @@ import './http_client.dart';
 import 'question.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import './global_colors.dart';
-import './shared_prefs_helper.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import './utils.dart';
 
 // Select lesson widget
@@ -22,46 +20,44 @@ class LevelSelectPage extends StatefulWidget {
 
 class _LevelSelectPage extends State<LevelSelectPage> {
   // Lesson selection view
-
-  late String courseId;
   late Future<List<LessonModel>> lessons;
 
   @override
   void initState() {
     super.initState();
-    courseId = widget.courseId;
-    lessons = fetchLessons(courseId);
-    loadData();
-  }
-
-   @override
-  void didUpdateWidget(covariant LevelSelectPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    setState(() {
-      lessons = fetchLessons(courseId);
-    });
-  }
-
-  Future<void> loadData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    String getId = prefs.getString("selectedCourseId") ?? "";
-    setState(() {
-      courseId = getId;
-    });
+    lessons = fetchLessons(widget.courseId);
+    //loadData();
   }
 
   @override
+  void didUpdateWidget(covariant LevelSelectPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    setState(() {
+      lessons = fetchLessons(widget.courseId);
+    });
+  }
+
+  //Future<void> loadData() async {
+  //  SharedPreferences prefs = await SharedPreferences.getInstance();
+  //  String getId = prefs.getString("selectedCourseId") ?? "";
+  //  setState(() {
+  //    courseId = getId;
+  //  });
+  //}
+
+  @override
   Widget build(BuildContext context) {
-    if(courseId == "") return const Text("Error");
 
     return FutureBuilder<List<LessonModel>>(
       future: lessons,
       builder: (_, snapshot) {
-        //print({"context level select page", context});
-        //print({"snapshot level select page", snapshot.data});
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: Transform.scale(
+              scale: 0.5, 
+              child: const CircularProgressIndicator(),
+            ),
+          );
         } else if (snapshot.hasError) {
           return Text("Erreur: ${snapshot.error}");
         } else if (snapshot.connectionState == ConnectionState.done) {
@@ -102,7 +98,6 @@ class _LessonListState extends State<LessonList> {
       cardPositions.add(randomSide);
     });
   }
-
 
   void _openLesson(String id) {
     Navigator.push(
@@ -147,7 +142,7 @@ class LessonCard extends StatelessWidget {
             ),
             child: InkWell(
                 onTap: () {
-                    //_openLesson(items[index]);
+                  //_openLesson(items[index]);
                 },
                 child: Stack(children: [
                   Container( // Background
@@ -170,7 +165,7 @@ class LessonCard extends StatelessWidget {
                         ),
                         child: FractionallySizedBox(
                           alignment: Alignment.centerLeft,
-                          widthFactor: 0.5, // Coefficient de progression
+                          widthFactor: Random().nextDouble() * 0.7, // Coefficient de progression
                           child: Container(
                             height: 10,
                             decoration: BoxDecoration(
@@ -211,30 +206,6 @@ class LessonCard extends StatelessWidget {
               )
             )
         )
-    );
-  }
-}
-
-// Temporary widget with bouncing animated button
-// Actually called anywhere
-class AnimatedButton extends StatelessWidget {
-  const AnimatedButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return  Column(children: <Widget>[
-        const Text('hello'),
-        ElevatedButton(
-            onPressed: () {
-              // Navigate where you want
-            },
-            child: BounceInDown(
-                child: Container(
-              width: 10,
-              height: 10,
-              decoration: const BoxDecoration(color: Colors.red),
-            ))),
-      ]
     );
   }
 }

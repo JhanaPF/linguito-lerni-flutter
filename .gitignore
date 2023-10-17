@@ -46,4 +46,4 @@ assets/savane.png
 assets/night.png
 assets/FrFlag.png
 
-*.env
+.env

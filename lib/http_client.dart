@@ -10,7 +10,6 @@ String rootUrl = "";
 String apiUrl = "";
 
 Future<String> getRootUrl () async{
-  
   await dotenv.load(fileName: ".env");
   var isProd = dotenv.env['ENV'] == "prod";
   if (isProd) {
@@ -19,13 +18,18 @@ Future<String> getRootUrl () async{
     if(getApiUrl != null) apiUrl = getApiUrl;
     if (apiUrl != "") return apiUrl;
   }
-
-  if(rootUrl != "") return rootUrl;
-
-  if (Platform.isAndroid || Platform.isIOS) {
-    rootUrl = 'http://10.0.2.2:7005/'; // When you are using android emulator 10.0.2.2 is the correct localhost
-  } else {
-    rootUrl = 'http://127.0.0.1:7005/';
+  else {
+    String? devPort = dotenv.env['DEV_PORT'];
+    if (devPort == null) {
+      return "";
+    } 
+    else {
+      if (Platform.isAndroid || Platform.isIOS) {
+        rootUrl = 'http://10.0.2.2:$devPort/'; // When you are using android emulator 10.0.2.2 is the correct localhost
+      } else {
+        rootUrl = 'http://127.0.0.1:$devPort/';
+      }
+    }
   }
 
   return rootUrl;
@@ -44,10 +48,15 @@ Future<Map<String, dynamic>> request(String endpoint, {String method = "get", Ma
     response = await http.put(url, body: data);
   } else if (method == "delete") {
     response = await http.delete(url, body: data);
-  } else {
+  } else { // GET method
     final queryString = Uri(queryParameters: data).query;
-    final uri = Uri.parse('$url?$queryString');
-    response = await http.get(uri);
+    if(data == null){
+      response = await http.get(url);
+    }
+    else {
+      final uri = Uri.parse('$url?$queryString');
+      response = await http.get(uri);
+    }
   }
 
   // print({"Status code": response.statusCode, "Body": response.body});
@@ -57,7 +66,7 @@ Future<Map<String, dynamic>> request(String endpoint, {String method = "get", Ma
     return jsonResponse;
   } else {
     final jsonResponse = jsonDecode(response.body);
-    print('Error: ${jsonResponse}');
+    //print('Error: ${jsonResponse}');
     Fluttertoast.showToast(msg: "Request failed");
     throw Exception('Request failed');
   }
@@ -66,20 +75,28 @@ Future<Map<String, dynamic>> request(String endpoint, {String method = "get", Ma
 Future<List<CourseModel>> fetchCourses() async {
   Map<String, dynamic> response = await request("courses");
   List<CourseModel> courses = [];
-  for (var course in response["data"]["courses"]) {
-    courses.add(CourseModel.fromJson(course));
+  print(response);
+  if (response.containsKey("courses")) {
+    for (var course in response["courses"]) {
+      courses.add(CourseModel.fromJson(course));
+    }
+    //print({"courses from fetch: ": courses});
+    return courses;
+  } else {
+    return [];
   }
-  //print({"courses from fetch: ": courses});
-  return courses;
 }
-
 
 Future<List<LessonModel>> fetchLessons(courseId) async {
   Map<String, dynamic> response = await request("lessons", data: {"course_id": courseId});
   List<LessonModel> lessons = [];
-  for (var lesson in response["data"]["lessons"]) {
-    lessons.add(LessonModel.fromJson(lesson));
+  if (response.containsKey("lessons")) {
+    for (var lesson in response["lessons"]) {
+      lessons.add(LessonModel.fromJson(lesson));
+    }
+    //print({"lessons from fetch: ": lessons});
+    return lessons;
+  } else {
+    return [];
   }
-  print({"lessons from fetch: ": lessons});
-  return lessons;
 }

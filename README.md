@@ -1,4 +1,5 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+
 # Linguito Lerni
 
 Open-source learning language app
@@ -10,20 +11,28 @@ https://docs.flutter.dev/get-started/install
 
 ```bash
   flutter pub get
-  flutter run
 ```
 
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your .env file
 
-`API_URL`
+`API_URL` This is a prod environment variable. For dev environment, url is set directly in http_client.dart.
 
 `ENV` "prod"/"dev"
 
 ## API
 
-Use the collaborative-dictionnary-api
+Use the [course-editor api](https://github.com/JhanaPF/Collaborative-Dictionnary)
+
+## Installation
+
+Install emulators first.
+Run your device.
+
+```bash
+  flutter run
+```
 
 ## Color Reference
 
@@ -35,5 +44,22 @@ Use the collaborative-dictionnary-api
 | Eucalyptus | ![#31F296](https://via.placeholder.com/10/31F296?text=+) #31F296 |
 
 
+## Logo
 
 ![Logo](assets/logo.png)
+
+
+## Contributing
+
+If you'd like to contribute to this project, follow these steps:
+
+1. Fork the project.
+2. Create a branch for your feature: `git checkout -b my-feature`.
+3. Make your changes.
+4. Commit and push your changes: `git commit -m "Add my feature"`.
+5. Create a pull request.
+6. Add your name in CONTRIBUTORS.md  
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for more details.

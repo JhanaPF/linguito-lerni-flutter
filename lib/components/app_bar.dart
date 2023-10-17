@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lingui_lerni/models.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../shared_prefs_helper.dart';
+import '../http_client.dart';
 
 // Top bar with course selection
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget { 
@@ -12,23 +12,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool selectedCourse;
   final List<CourseModel> courses;
   final void Function(String) updateSelectedCourse;
-  
+
   const CustomAppBar({
     super.key,
     required this.title, 
     required this.gradientColors, 
     required this.selectedCourse, 
     required this.courses,
-    required this.updateSelectedCourse
+    required this.updateSelectedCourse,
   });
 
-  String _getFlagUrl(fileName){
-    String flagUrl = "${dotenv.env['API_URL'] ?? ""}pictures/courses/$fileName";
-    return flagUrl;
-  }
 
   void _openCourseSelection(BuildContext context) async{
     await dotenv.load(fileName: ".env");
+    var url = await getRootUrl();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
 
@@ -48,7 +45,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     //print({context, index});
                     CourseModel course = courses[index];
                     String fileName = course.fileName;
-                    String flagUrl = _getFlagUrl(fileName);
+                    String flagUrl = "${url}pictures/courses/$fileName";
 
                     return ListTile(
                       leading: CircleAvatar(
