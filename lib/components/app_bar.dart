@@ -22,7 +22,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.updateSelectedCourse,
   });
 
-
   void _openCourseSelection(BuildContext context) async{
     await dotenv.load(fileName: ".env");
     var url = await getRootUrl();
@@ -74,7 +73,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   
     return AppBar(
       systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Colors.grey),
-      backgroundColor: Colors.transparent,
+      backgroundColor: Color.fromARGB(0, 49, 49, 49),
       elevation: 0,
       flexibleSpace: Container(
         decoration: BoxDecoration(
@@ -86,7 +85,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      title: Text(title),
+      title: Text(title, style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),),
       //leading: const BackButton(),
       actions: [
         IconButton(

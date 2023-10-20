@@ -58,15 +58,14 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) return const CircularProgressIndicator();
-    print(selectedCourseId);
 
     return MaterialApp(
       home: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
-        backgroundColor: const Color.fromARGB(255, 236, 236, 236),
+        backgroundColor: const Color.fromARGB(255, 214, 214, 214),
         appBar: CustomAppBar(
-          title: 'Lingui Lerni',
+          title: 'Linguito Lerni',
           gradientColors: const [Color.fromARGB(255, 158, 255, 161), Color.fromARGB(255, 44, 255, 202)], 
           selectedCourse: courseSelected,
           courses:  _courses,
