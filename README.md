@@ -48,6 +48,13 @@ Run your device.
 
 ![Logo](assets/logo.png)
 
+## Screenshots
+
+  <p style="display: flex; justify-content: center; text-align:center;">
+      <img style="width: 30%; margin: auto;" src="assets/screens/Select_Language.png">
+      <img style="width: 30%; margin: auto;" src="assets/screens/Select_Lesson.png">
+      <img style="width: 30%; margin: auto;" src="assets/screens/Select_Lesson_2.png">
+  </p>
 
 ## Contributing
 
